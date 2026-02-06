@@ -89,8 +89,8 @@
             const u = data[name];
             
             // LOGIKA BADGE
-            let mahkota = u.count >= 5 ? '<span class="badge-mahkota">👑</span>' : '';
-            let ceklis = u.total >= 100000 ? '<span class="badge-ceklis">✅</span>' : '';
+            let mahkota = u.count >= 5 ? '<span class="badge-mahkota"><i class="fa-solid fa-crown"></i></span>' : '';
+            let ceklis = u.total >= 100000 ? '<span class="badge-ceklis"><i class="fa-solid fa-circle-check"></i></span>' : '';
 
             container.innerHTML += `
             <div class="item">
