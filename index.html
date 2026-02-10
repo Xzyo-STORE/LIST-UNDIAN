@@ -3,78 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel True - Xzyo Store</title>
+    <title>VIP Leaderboard - Xzyo Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <style>
-        :root { --blue: #0072ff; --dark: #0b1220; --card: #111a33; --green: #00ff88; }
-        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        .admin-card { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 600px; border: 1px solid var(--blue); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        h2 { color: var(--blue); text-align: center; margin-bottom: 10px; }
-        .input-group { margin-bottom: 15px; }
-        label { font-size: 12px; color: #7cc7ff; margin-bottom: 5px; display: block; }
-        
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; background: #0b1220; color: white; outline: none; }
-        input:focus { border-color: var(--blue); }
-
-        .btn-add { width: 100%; padding: 15px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
-        .btn-add:hover { background: #0056cc; transform: translateY(-2px); }
-
-        .database-title { margin-top: 30px; border-bottom: 2px solid #222; padding-bottom: 10px; color: var(--green); font-size: 18px; display: flex; align-items: center; gap: 10px; }
-
-        .list-container { margin-top: 15px; }
-        .list-item { 
-            background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; margin-bottom: 10px; 
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;
+        :root {
+            --primary-blue: #0072ff;
+            --dark-bg: #0b1220;
+            --card-bg: #111a33;
+            --gold: #ffd700;
+            --diamond: #b9f2ff;
         }
-        .user-detail b { color: var(--blue); font-size: 16px; }
-        .user-detail p { margin: 5px 0 0 0; font-size: 13px; color: #aaa; }
-        .user-stats { text-align: right; }
-        .user-stats span { display: block; font-weight: bold; color: var(--green); }
-        .user-stats small { color: #ffd700; font-size: 11px; }
 
-        .btn-del { background: #ff4d4d; border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-left: 15px; transition: 0.3s; }
-        .btn-del:hover { background: #cc0000; }
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--dark-bg);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .leaderboard-container {
+            max-width: 500px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 114, 255, 0.3);
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+
+        h2 { 
+            text-align: center; 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        p.subtitle { text-align: center; font-size: 12px; color: #7cc7ff; margin-bottom: 30px; }
+
+        .vip-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .vip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+
+        /* Styling Top 3 */
+        .vip-item:nth-child(1) { border: 1px solid var(--gold); background: rgba(255, 215, 0, 0.05); }
+        .vip-item:nth-child(2) { border: 1px solid #c0c0c0; }
+        .vip-item:nth-child(3) { border: 1px solid #cd7f32; }
+
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .rank { font-weight: bold; color: #555; width: 20px; font-style: italic; }
+
+        .username { font-weight: 600; font-size: 15px; letter-spacing: 0.5px; }
+
+        /* ICON LOGO MEWAH */
+        .ceklis-mewah { color: #00ff88; text-shadow: 0 0 8px #00ff88; margin-left: 5px; }
+        .mahkota-biasa { color: var(--gold); text-shadow: 0 0 8px var(--gold); margin-left: 5px; }
+        .mahkota-sultan { color: var(--diamond); text-shadow: 0 0 15px var(--diamond); font-size: 1.1em; margin-left: 5px; }
+
+        .amount { color: #00ff88; font-weight: bold; font-family: 'Consolas', monospace; }
+
+        #loading-text { text-align: center; color: #7cc7ff; font-style: italic; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="admin-card">
-        <h2><i class="fa-solid fa-user-shield"></i> ADMIN PANEL TRUE</h2>
-        
-        <div class="input-group">
-            <label>Password Admin:</label>
-            <input type="password" id="adminPass" placeholder="Masukkan Password">
-        </div>
+    <div class="leaderboard-container">
+        <h2><i class="fa-solid fa-crown"></i> VIP SULTAN LIST</h2>
+        <p class="subtitle">Update Otomatis • Xzyo Store Official</p>
 
-        <hr style="border: 0.5px solid #222; margin: 20px 0;">
-
-        <div class="input-group">
-            <label>Username Player:</label>
-            <input type="text" id="targetUser" placeholder="Contoh: Xzyo_Gamer">
-        </div>
-        <div class="input-group">
-            <label>Nomor WhatsApp:</label>
-            <input type="text" id="targetWA" placeholder="Contoh: 0896xxxx">
-        </div>
-        <div class="input-group">
-            <label>Nominal Joki (Rp):</label>
-            <input type="number" id="targetNominal" placeholder="Masukkan Nominal">
-        </div>
-
-        <button class="btn-add" onclick="tambahSultan()">UPDATE DATA SULTAN</button>
-
-        <div class="database-title">
-            <i class="fa-solid fa-database"></i> DATA SULTAN REALTIME
-        </div>
-        <div id="adminList" class="list-container">Memuat data database...</div>
+        <div id="loading-text">Memuat data sultan...</div>
+        <div class="vip-list" id="vipContent"></div>
     </div>
 
+    <p style="margin-top: 20px; font-size: 11px; color: #444;">&copy; 2026 Xzyo Store - Trusted Joki</p>
+
 <script>
+    // --- KONFIGURASI FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
         authDomain: "xzyostore-66448.firebaseapp.com",
@@ -82,80 +106,62 @@
         projectId: "xzyostore-66448",
         appId: "1:547146618223:web:978b8956cc0293cfb7449a"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // PASSWORD ADMIN KAMU
-    const PASS_ADMIN = "xzyo123";
+    // AMBIL DATA REALTIME
+    db.ref('sultan').on('value', (snapshot) => {
+        const loading = document.getElementById('loading-text');
+        if (loading) loading.style.display = 'none';
 
-    function tambahSultan() {
-        const pass = document.getElementById('adminPass').value;
-        if(pass !== PASS_ADMIN) return alert("Password Admin Salah!");
-
-        const user = document.getElementById('targetUser').value.trim();
-        const wa = document.getElementById('targetWA').value.trim();
-        const nominal = parseInt(document.getElementById('targetNominal').value);
-
-        if(!user || !nominal || !wa) return alert("Semua kolom (Nama, WA, Nominal) wajib diisi le!");
-
-        const ref = db.ref('sultan/' + user);
-        ref.once('value').then(snap => {
-            const d = snap.val() || { total: 0, count: 0 };
-            ref.update({
-                total: d.total + nominal,
-                count: d.count + 1,
-                whatsapp: wa
-            }).then(() => {
-                alert("Berhasil! Data " + user + " sudah diupdate.");
-                document.getElementById('targetNominal').value = "";
-                document.getElementById('targetUser').value = "";
-                document.getElementById('targetWA').value = "";
-            });
-        });
-    }
-
-    function hapusSultan(nama) {
-        const pass = document.getElementById('adminPass').value;
-        if(pass !== PASS_ADMIN) return alert("Password Salah!");
-        
-        if(confirm("Yakin mau hapus permanen data " + nama + "?")) {
-            db.ref('sultan/' + nama).remove();
-        }
-    }
-
-    // Tampilkan List Detail untuk Admin
-    db.ref('sultan').on('value', (s) => {
-        const data = s.val();
-        const container = document.getElementById('adminList');
+        const data = snapshot.val();
+        const container = document.getElementById('vipContent');
         container.innerHTML = "";
-        
-        if(data) {
-            // Urutkan biar yang paling kaya tetap di atas di panel admin
-            const sorted = Object.keys(data).sort((a,b) => data[b].total - data[a].total);
 
-            sorted.forEach(name => {
-                const u = data[name];
+        if (data) {
+            // Sortir: Yang total nominalnya paling besar ada di paling atas
+            const sortedKeys = Object.keys(data).sort((a, b) => data[b].total - data[a].total);
+
+            sortedKeys.forEach((key, index) => {
+                const user = data[key];
+                const totalNominal = user.total || 0;
+                const totalJoki = user.count || 0;
+
+                // LOGIKA LOGO MEWAH
+                let badgeHTML = "";
+                
+                // 1. Ceklis Mewah (Total >= 100.000)
+                if (totalNominal >= 100000) {
+                    badgeHTML += '<i class="fa-solid fa-circle-check ceklis-mewah"></i>';
+                }
+
+                // 2. Mahkota (Order >= 5 kali)
+                if (totalJoki >= 5) {
+                    badgeHTML += '<i class="fa-solid fa-crown mahkota-biasa"></i>';
+                }
+
+                // 3. Mahkota Sultan Mewah (Total >= 150.000)
+                if (totalNominal >= 150000) {
+                    badgeHTML += '<i class="fa-solid fa-gem mahkota-sultan"></i>';
+                }
+
+                // Masukkan ke tampilan
                 container.innerHTML += `
-                <div class="list-item">
-                    <div class="user-detail">
-                        <b>${name}</b>
-                        <p><i class="fa-brands fa-whatsapp"></i> ${u.whatsapp}</p>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <div class="user-stats">
-                            <span>Rp ${u.total.toLocaleString()}</span>
-                            <small>${u.count}x Joki</small>
+                    <div class="vip-item">
+                        <div class="user-info">
+                            <span class="rank">#${index + 1}</span>
+                            <span class="username">${key} ${badgeHTML}</span>
                         </div>
-                        <button class="btn-del" onclick="hapusSultan('${name}')">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        <span class="amount">Rp ${totalNominal.toLocaleString()}</span>
                     </div>
-                </div>`;
+                `;
             });
         } else {
-            container.innerHTML = "<p style='text-align:center; color:#555;'>Database Kosong.</p>";
+            container.innerHTML = "<p style='text-align:center; font-size:13px;'>Belum ada nama sultan terdaftar.</p>";
         }
     });
 </script>
+
 </body>
 </html>
