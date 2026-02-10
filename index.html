@@ -1,166 +1,190 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Leaderboard - Xzyo Store</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP Leaderboard - Xzyo Store</title>
 
-    <style>
-        :root {
-            --primary-blue: #0072ff;
-            --dark-bg: #0b1220;
-            --card-bg: #111a33;
-            --gold: #ffd700;
-            --diamond: #b9f2ff;
-        }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        * { box-sizing: border-box; }
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-        body {
-            background: var(--dark-bg);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-        }
+<style>
+:root{
+    --blue:#0072ff;
+    --bg:#0b1220;
+    --card:#111a33;
+    --gold:#ffd700;
+    --diamond:#b9f2ff;
+}
+*{box-sizing:border-box}
+body{
+    background:var(--bg);
+    color:#fff;
+    font-family:Segoe UI;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:20px;
+    margin:0
+}
+.leaderboard-container{
+    max-width:500px;
+    width:100%;
+    background:var(--card);
+    border-radius:20px;
+    padding:25px;
+    border:1px solid rgba(0,114,255,.3);
+    box-shadow:0 15px 35px rgba(0,0,0,.6)
+}
+h2{
+    text-align:center;
+    color:var(--gold);
+    letter-spacing:2px;
+    margin:0
+}
+.subtitle{
+    text-align:center;
+    font-size:12px;
+    color:#7cc7ff;
+    margin-bottom:25px
+}
+.vip-list{display:flex;flex-direction:column;gap:12px}
+.vip-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px;
+    border-radius:12px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.05);
+    transition:.3s
+}
+.vip-item:hover{background:rgba(0,114,255,.1)}
+.vip-item:nth-child(1){border:1px solid var(--gold)}
+.vip-item:nth-child(2){border:1px solid silver}
+.vip-item:nth-child(3){border:1px solid #cd7f32}
 
-        .leaderboard-container {
-            max-width: 500px;
-            width: 100%;
-            background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid rgba(0, 114, 255, 0.3);
-            padding: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-        }
+.user-info{display:flex;gap:10px;align-items:center}
+.rank{font-style:italic;color:#aaa;width:30px}
+.username{font-weight:600}
 
-        h2 { 
-            text-align: center; 
-            color: var(--gold); 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
+.ceklis-mewah{color:#00ff88;text-shadow:0 0 8px #00ff88}
+.mahkota-biasa{color:var(--gold);text-shadow:0 0 8px var(--gold)}
+.mahkota-sultan{color:var(--diamond);text-shadow:0 0 12px var(--diamond)}
 
-        p.subtitle { text-align: center; font-size: 12px; color: #7cc7ff; margin-bottom: 30px; }
+.amount{color:#00ff88;font-family:Consolas;font-weight:bold}
 
-        .vip-list { display: flex; flex-direction: column; gap: 12px; }
-
-        .vip-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255,255,255,0.03);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s;
-        }
-
-        /* Styling Top 3 */
-        .vip-item:nth-child(1) { border: 1px solid var(--gold); background: rgba(255, 215, 0, 0.05); }
-        .vip-item:nth-child(2) { border: 1px solid #c0c0c0; }
-        .vip-item:nth-child(3) { border: 1px solid #cd7f32; }
-
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .rank { font-weight: bold; color: #555; width: 20px; font-style: italic; }
-
-        .username { font-weight: 600; font-size: 15px; letter-spacing: 0.5px; }
-
-        /* ICON LOGO MEWAH */
-        .ceklis-mewah { color: #00ff88; text-shadow: 0 0 8px #00ff88; margin-left: 5px; }
-        .mahkota-biasa { color: var(--gold); text-shadow: 0 0 8px var(--gold); margin-left: 5px; }
-        .mahkota-sultan { color: var(--diamond); text-shadow: 0 0 15px var(--diamond); font-size: 1.1em; margin-left: 5px; }
-
-        .amount { color: #00ff88; font-weight: bold; font-family: 'Consolas', monospace; }
-
-        #loading-text { text-align: center; color: #7cc7ff; font-style: italic; margin-top: 20px; }
-    </style>
+#adminPanel{
+    display:none;
+    max-width:500px;
+    width:100%;
+    margin-top:15px;
+    background:#0e1630;
+    border:1px solid var(--blue);
+    border-radius:15px;
+    padding:15px
+}
+#adminPanel input,button{
+    width:100%;
+    padding:10px;
+    margin-bottom:8px;
+    border-radius:8px;
+    border:none
+}
+button{background:var(--blue);color:#fff}
+</style>
 </head>
+
 <body>
 
-    <div class="leaderboard-container">
-        <h2><i class="fa-solid fa-crown"></i> VIP SULTAN LIST</h2>
-        <p class="subtitle">Update Otomatis • Xzyo Store Official</p>
+<div class="leaderboard-container">
+    <h2><i class="fa-solid fa-crown"></i> VIP SULTAN</h2>
+    <p class="subtitle">Realtime • Xzyo Store</p>
+    <div id="vipContent" class="vip-list"></div>
+</div>
 
-        <div id="loading-text">Memuat data sultan...</div>
-        <div class="vip-list" id="vipContent"></div>
-    </div>
+<div id="adminPanel">
+    <h3 style="color:#7cc7ff;margin-top:0">➕ Tambah Sultan</h3>
+    <input id="nameInput" placeholder="Username">
+    <input id="totalInput" type="number" placeholder="Total Nominal">
+    <input id="countInput" type="number" placeholder="Jumlah Order">
+    <button onclick="addUser()">Tambah</button>
+</div>
 
-    <p style="margin-top: 20px; font-size: 11px; color: #444;">&copy; 2026 Xzyo Store - Trusted Joki</p>
+<p style="font-size:11px;color:#444;margin-top:20px">© 2026 Xzyo Store</p>
 
 <script>
-    // --- KONFIGURASI FIREBASE ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
-        authDomain: "xzyostore-66448.firebaseapp.com",
-        databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "xzyostore-66448",
-        appId: "1:547146618223:web:978b8956cc0293cfb7449a"
-    };
+// ===== ADMIN MODE =====
+const params = new URLSearchParams(location.search);
+let isAdmin=false;
+if(params.get("admin")==="true"){
+    const pass=prompt("Password Admin:");
+    if(pass==="xzyosultan"){ // GANTI PASSWORD
+        isAdmin=true;
+        document.getElementById("adminPanel").style.display="block";
+        alert("Admin aktif 👑");
+    }else alert("Password salah");
+}
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+// ===== FIREBASE =====
+firebase.initializeApp({
+    apiKey:"AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
+    authDomain:"xzyostore-66448.firebaseapp.com",
+    databaseURL:"https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:"xzyostore-66448",
+    appId:"1:547146618223:web:978b8956cc0293cfb7449a"
+});
+const db=firebase.database();
 
-    // AMBIL DATA REALTIME
-    db.ref('sultan').on('value', (snapshot) => {
-        const loading = document.getElementById('loading-text');
-        if (loading) loading.style.display = 'none';
+// ===== LOAD DATA =====
+db.ref("sultan").on("value",snap=>{
+    const data=snap.val();
+    vipContent.innerHTML="";
+    if(!data) return;
 
-        const data = snapshot.val();
-        const container = document.getElementById('vipContent');
-        container.innerHTML = "";
+    Object.keys(data)
+    .sort((a,b)=>data[b].total-data[a].total)
+    .forEach((name,i)=>{
+        const u=data[name];
+        let badge="";
+        if(u.total>=100000) badge+=`<i class="fa-solid fa-circle-check ceklis-mewah"></i>`;
+        if(u.count>=5) badge+=` <i class="fa-solid fa-crown mahkota-biasa"></i>`;
+        if(u.total>=150000) badge+=` <i class="fa-solid fa-gem mahkota-sultan"></i>`;
 
-        if (data) {
-            // Sortir: Yang total nominalnya paling besar ada di paling atas
-            const sortedKeys = Object.keys(data).sort((a, b) => data[b].total - data[a].total);
-
-            sortedKeys.forEach((key, index) => {
-                const user = data[key];
-                const totalNominal = user.total || 0;
-                const totalJoki = user.count || 0;
-
-                // LOGIKA LOGO MEWAH
-                let badgeHTML = "";
-                
-                // 1. Ceklis Mewah (Total >= 100.000)
-                if (totalNominal >= 100000) {
-                    badgeHTML += '<i class="fa-solid fa-circle-check ceklis-mewah"></i>';
-                }
-
-                // 2. Mahkota (Order >= 5 kali)
-                if (totalJoki >= 5) {
-                    badgeHTML += '<i class="fa-solid fa-crown mahkota-biasa"></i>';
-                }
-
-                // 3. Mahkota Sultan Mewah (Total >= 150.000)
-                if (totalNominal >= 150000) {
-                    badgeHTML += '<i class="fa-solid fa-gem mahkota-sultan"></i>';
-                }
-
-                // Masukkan ke tampilan
-                container.innerHTML += `
-                    <div class="vip-item">
-                        <div class="user-info">
-                            <span class="rank">#${index + 1}</span>
-                            <span class="username">${key} ${badgeHTML}</span>
-                        </div>
-                        <span class="amount">Rp ${totalNominal.toLocaleString()}</span>
-                    </div>
-                `;
-            });
-        } else {
-            container.innerHTML = "<p style='text-align:center; font-size:13px;'>Belum ada nama sultan terdaftar.</p>";
-        }
+        vipContent.innerHTML+=`
+        <div class="vip-item"
+        ${isAdmin?`onclick="editUser('${name}',${u.total},${u.count})"
+        oncontextmenu="deleteUser(event,'${name}')"
+        style="cursor:pointer"`:""}>
+            <div class="user-info">
+                <span class="rank">#${i+1}</span>
+                <span class="username">${name} ${badge}</span>
+            </div>
+            <span class="amount">Rp ${u.total.toLocaleString()}</span>
+        </div>`;
     });
+});
+
+// ===== ADMIN ACTION =====
+function addUser(){
+    db.ref("sultan/"+nameInput.value).set({
+        total:+totalInput.value,
+        count:+countInput.value
+    });
+    nameInput.value=totalInput.value=countInput.value="";
+}
+function editUser(n,t,c){
+    const nt=prompt("Total Nominal:",t); if(nt===null)return;
+    const nc=prompt("Jumlah Order:",c); if(nc===null)return;
+    db.ref("sultan/"+n).update({total:+nt,count:+nc});
+}
+function deleteUser(e,n){
+    e.preventDefault();
+    if(confirm("Hapus "+n+"?"))
+        db.ref("sultan/"+n).remove();
+}
 </script>
 
 </body>
