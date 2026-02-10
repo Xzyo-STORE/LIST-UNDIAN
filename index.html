@@ -1,229 +1,152 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xzyo Store - Joki Blox Fruit</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Leaderboard - Xzyo Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-<style>
-:root {
---primary-blue:#0072ff;
---dark-bg:#0b1220;
---card-bg:#111a33;
---text-white:#ffffff;
---neon-shadow:0 0 15px rgba(0,114,255,.7);
-}
-*{box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
-body{
-background:var(--dark-bg);
-color:var(--text-white);
-margin:0;
-padding:20px;
-display:flex;
-flex-direction:column;
-align-items:center;
-}
-.wrapper{max-width:1000px;width:100%}
-h2{text-align:center;margin-bottom:5px;letter-spacing:2px}
-.subtitle{text-align:center;color:#7cc7ff;margin-bottom:20px}
-.btn{
-width:100%;
-padding:15px;
-border-radius:12px;
-border:none;
-margin-top:15px;
-background:linear-gradient(90deg,#020617,#0b3c8a,#020617);
-background-size:200% auto;
-color:white;
-font-weight:bold;
-cursor:pointer;
-transition:.3s;
-font-size:16px;
-}
-.btn:hover{transform:scale(1.03);box-shadow:0 0 25px rgba(0,114,255,.8)}
-.container{display:flex;gap:20px;align-items:flex-start;margin-top:20px}
-.left-side{flex:1;position:sticky;top:20px;min-width:320px}
-.right-side{flex:1.2;min-width:320px}
-.card{
-background:var(--card-bg);
-border-radius:15px;
-padding:25px;
-margin-bottom:20px;
-}
-input,textarea{
-width:100%;
-padding:12px;
-border-radius:8px;
-border:1px solid #1e293b;
-margin-top:10px;
-background:#0b1220;
-color:white;
-}
-.section-title{
-margin-top:20px;
-font-weight:bold;
-color:var(--primary-blue);
-border-bottom:1px solid rgba(255,255,255,.1);
-padding-bottom:5px;
-}
-.price-list{list-style:none;padding:0;margin:0}
-.price-list li{
-display:flex;
-justify-content:space-between;
-padding:10px 0;
-border-bottom:1px solid rgba(255,255,255,.05);
-font-size:14px;
-}
-.old-p{text-decoration:line-through;color:#ff4d4d;font-size:12px}
-.new-p{color:#00c6ff;font-weight:800;font-size:15px}
+    <style>
+        :root {
+            --primary-blue: #0072ff;
+            --dark-bg: #0b1220;
+            --card-bg: #111a33;
+            --gold: #ffd700;
+            --diamond: #b9f2ff;
+        }
 
-/* === ANIMASI CEKLIS ASLI (TIDAK DIUBAH) === */
-.checkmark-wrapper{width:100px;height:100px;margin:0 auto 20px}
-.checkmark-circle,.checkmark-kick{
-fill:none;
-stroke:#00ff88;
-stroke-linecap:round;
-stroke-dasharray:200;
-stroke-dashoffset:200;
-}
-.active .checkmark-circle{
-stroke-width:3;
-stroke-dasharray:166;
-stroke-dashoffset:166;
-animation:drawStroke .6s cubic-bezier(.65,0,.45,1) forwards;
-}
-.active .checkmark-kick{
-stroke-width:5;
-stroke-dasharray:48;
-stroke-dashoffset:48;
-animation:drawStroke .3s cubic-bezier(.65,0,.45,1) .6s forwards;
-}
-@keyframes drawStroke{100%{stroke-dashoffset:0}}
+        body {
+            background: var(--dark-bg);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
 
-#order-slide{
-display:none;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-}
-</style>
+        .leaderboard-container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 114, 255, 0.3);
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { text-align: center; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; }
+        p.subtitle { text-align: center; font-size: 12px; color: #7cc7ff; margin-bottom: 30px; }
+
+        .vip-list { display: flex; flex-direction: column; gap: 15px; }
+
+        .vip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border-left: 4px solid transparent;
+            transition: 0.3s;
+        }
+
+        /* Rank 1-3 Style */
+        .vip-item:nth-child(1) { border-left-color: var(--gold); background: rgba(255, 215, 0, 0.1); }
+        .vip-item:nth-child(2) { border-left-color: #c0c0c0; }
+        .vip-item:nth-child(3) { border-left-color: #cd7f32; }
+
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .rank-num { font-weight: bold; color: #555; width: 25px; }
+
+        .username { font-weight: 600; font-size: 16px; }
+
+        /* LOGO MEWAH */
+        .badge-ceklis { color: #00ff88; text-shadow: 0 0 10px #00ff88; margin-left: 5px; }
+        .badge-mahkota { color: var(--gold); text-shadow: 0 0 10px var(--gold); margin-left: 5px; }
+        .badge-sultan { color: var(--diamond); text-shadow: 0 0 15px var(--diamond); font-size: 1.2em; }
+
+        .total-duit { color: #00ff88; font-weight: bold; font-family: 'Courier New', monospace; }
+
+        #loading { text-align: center; color: #7cc7ff; }
+    </style>
 </head>
-
 <body>
 
-<div class="wrapper">
-<h2>JOKI BF XZYO STORE</h2>
-<p class="subtitle">Dijamin Murah, Aman, dan Terpercaya</p>
+    <div class="leaderboard-container">
+        <h2><i class="fa-solid fa-crown"></i> TOP VIP SULTAN</h2>
+        <p class="subtitle">REALTIME UPDATE BY XZYO STORE</p>
 
-<div class="container">
-
-<!-- KIRI -->
-<div class="left-side">
-<div class="card">
-
-<iframe name="frame_gaib" style="display:none"></iframe>
-
-<form id="orderForm" action="https://formsubmit.co/xzyostore@gmail.com" method="POST" target="frame_gaib" enctype="multipart/form-data">
-<input type="hidden" name="_captcha" value="false">
-<input type="hidden" name="_subject" id="email_subject">
-
-<input type="text" id="usernameInput" name="Username" placeholder="Username Roblox" required>
-
-<div style="position:relative">
-<input type="password" id="pw" name="Password" placeholder="Password Roblox" required>
-<i id="eye" class="fa-solid fa-eye-slash" onclick="togglePw()" style="position:absolute;right:12px;top:22px;cursor:pointer;color:#555"></i>
-</div>
-
-<input type="text" name="WhatsApp" placeholder="Nomor WA Aktif" required>
-<textarea name="Jenis Joki" placeholder="Contoh: Joki Level 1500 - MAX" rows="3" required></textarea>
-<input type="file" name="Bukti Transfer" accept="image/*" required>
-
-<button type="submit" class="btn">ORDER SEKARANG</button>
-
-<div style="margin-top:15px;background:rgba(0,0,0,.3);padding:10px;border-radius:8px">
-<b>PAYMENT</b><br><br>
-DANA : 089677329404<br>
-GOPAY / OVO : 089517154561
-</div>
-
-<button type="button" class="btn" onclick="bukaQris()" style="background:linear-gradient(90deg,#ec4899,#8b5cf6)">
-<i class="fa-solid fa-qrcode"></i> LIHAT QRIS (GOOGLE DRIVE)
-</button>
-</form>
-
-<!-- SLIDE SELESAI (ASLI) -->
-<div id="order-slide">
-<div class="checkmark-wrapper">
-<svg viewBox="0 0 52 52">
-<circle class="checkmark-circle" cx="26" cy="26" r="25"/>
-<path class="checkmark-kick" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-</svg>
-</div>
-<h3 style="color:#00ff88">ORDER TELAH TERKIRIM!</h3>
-<p style="color:#ccc;font-size:14px">
-Tunggu kabar dari kami lek. Admin akan menghubungi via WhatsApp.
-</p>
-</div>
-
-</div>
-</div>
-
-<!-- KANAN -->
-<div class="right-side">
-<div class="card">
-<h3 style="text-align:center;margin-top:0">LIST JOKI DISKON 15%</h3>
-
-<div class="section-title">Instinct</div>
-<ul class="price-list">
-<li>0 – 1000 <span><span class="old-p">5k</span> <span class="new-p">4.2k</span></span></li>
-<li>1000 – 2000 <span><span class="old-p">8k</span> <span class="new-p">6.8k</span></span></li>
-<li>2000 – MAX + V2 <span><span class="old-p">15k</span> <span class="new-p">12.7k</span></span></li>
-</ul>
-</div>
-</div>
-
-</div>
-</div>
-
-<!-- MODAL QRIS -->
-<div id="qrisModal" style="display:none;position:fixed;z-index:1000;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);justify-content:center;align-items:center;flex-direction:column;backdrop-filter:blur(5px)">
-<img id="qrisImg" style="max-width:90%;max-height:70%;border-radius:15px;border:3px solid #0072ff;box-shadow:0 0 20px #0072ff">
-<p style="color:#00ff88;margin-top:15px;font-weight:bold">SCAN QRIS DI ATAS LEK</p>
-<button class="btn" style="width:150px;background:#ff4d4d" onclick="tutupQris()">TUTUP</button>
-</div>
+        <div id="loading">Memanggil para Sultan...</div>
+        <div class="vip-list" id="vipContent"></div>
+    </div>
 
 <script>
-function togglePw(){
-let pw=document.getElementById("pw");
-let eye=document.getElementById("eye");
-pw.type=pw.type==="password"?"text":"password";
-eye.classList.toggle("fa-eye");
-eye.classList.toggle("fa-eye-slash");
-}
+    // --- KONFIGURASI FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
+        authDomain: "xzyostore-66448.firebaseapp.com",
+        databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "xzyostore-66448",
+        appId: "1:547146618223:web:978b8956cc0293cfb7449a"
+    };
 
-/* === LOGIC ANIMASI ASLI (TIDAK DIUBAH) === */
-document.getElementById("orderForm").addEventListener("submit",function(){
-document.getElementById("email_subject").value="Pesanan Joki dari: "+document.getElementById("usernameInput").value;
-let form=this;
-let slide=document.getElementById("order-slide");
-form.style.opacity="0";
-setTimeout(()=>{
-form.style.display="none";
-slide.style.display="flex";
-slide.classList.add("active");
-},300);
-});
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-function bukaQris(){
-const id="1emJk_GFVcRN6Dd0Mnha_MrNyGHxL8QLt";
-document.getElementById("qrisImg").src=`https://lh3.googleusercontent.com/d/${id}`;
-document.getElementById("qrisModal").style.display="flex";
-}
-function tutupQris(){
-document.getElementById("qrisModal").style.display="none";
-}
+    // Mendengarkan data secara Realtime
+    db.ref('sultan').on('value', (snapshot) => {
+        document.getElementById('loading').style.display = 'none';
+        const data = snapshot.val();
+        const container = document.getElementById('vipContent');
+        container.innerHTML = "";
+
+        if (data) {
+            // Urutkan berdasarkan total nominal tertinggi
+            const sortedKeys = Object.keys(data).sort((a, b) => data[b].total - data[a].total);
+
+            sortedKeys.forEach((key, index) => {
+                const user = data[key];
+                const total = user.total || 0;
+                const count = user.count || 0;
+
+                // LOGIKA LOGO MEWAH
+                let badges = "";
+                
+                // 1. Ceklis Mewah (Total >= 100k)
+                if (total >= 100000) {
+                    badges += '<i class="fa-solid fa-circle-check badge-ceklis" title="Sultan Terverifikasi"></i>';
+                }
+
+                // 2. Mahkota Biasa (Order >= 5 kali)
+                if (count >= 5) {
+                    badges += '<i class="fa-solid fa-crown badge-mahkota" title="Pelanggan Setia"></i>';
+                }
+
+                // 3. Mahkota Mewah Sultan (Total >= 150k)
+                if (total >= 150000) {
+                    badges += '<i class="fa-solid fa-gem badge-sultan" title="Sultan Diamond"></i>';
+                }
+
+                // Render Item
+                container.innerHTML += `
+                    <div class="vip-item">
+                        <div class="user-info">
+                            <span class="rank-num">${index + 1}</span>
+                            <span class="username">${key} ${badges}</span>
+                        </div>
+                        <span class="total-duit">Rp ${total.toLocaleString()}</span>
+                    </div>
+                `;
+            });
+        } else {
+            container.innerHTML = "<p style='text-align:center;'>Belum ada data sultan lek.</p>";
+        }
+    });
 </script>
 
 </body>
