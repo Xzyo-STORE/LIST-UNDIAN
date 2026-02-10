@@ -100,8 +100,8 @@ button{background:var(--blue);color:#fff}
 <body>
 
 <div class="leaderboard-container">
-    <h2><i class="fa-solid fa-crown"></i> VIP SULTAN</h2>
-    <p class="subtitle">Realtime • Xzyo Store</p>
+    <h2><i class="fa-solid fa-crown"></i> VIP XZYO</h2>
+    <p class="subtitle">List VIP • Xzyo Store</p>
     <div id="vipContent" class="vip-list"></div>
 </div>
 
@@ -121,10 +121,10 @@ const params = new URLSearchParams(location.search);
 let isAdmin=false;
 if(params.get("admin")==="true"){
     const pass=prompt("Password Admin:");
-    if(pass==="xzyosultan"){ // GANTI PASSWORD
+    if(pass==="xzyo"){ // GANTI PASSWORD
         isAdmin=true;
         document.getElementById("adminPanel").style.display="block";
-        alert("Admin aktif 👑");
+        alert("Admin Sukses =On");
     }else alert("Password salah");
 }
 
